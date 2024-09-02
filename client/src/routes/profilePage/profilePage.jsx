@@ -1,8 +1,35 @@
+import { useNavigate } from "react-router-dom";
 import Chat from "../../components/chat/Chat";
 import List from "../../components/list/List";
 import "./profilePage.scss";
+import { useState, useTransition } from "react";
+import { apiRequest } from "../../lib/apiRequest";
 
 function ProfilePage() {
+
+  const [error, setError] = useState("")
+  const [pending, startTransition] = useTransition()
+  const navigate = useNavigate()
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+
+    try {
+      startTransition(async () => {
+        const res = await apiRequest.post("/auth/logout");
+
+        //setting userInfo in the local storage and rediercting him to the home page
+        localStorage.removeItem("user")
+        // console.log(res.data)
+        navigate('/login')
+      })
+
+    } catch (error) {
+      setError(error?.response?.data?.message)
+      console.log(error)
+    }
+  }
+
   return (
     <div className="profilePage">
       <div className="details">
@@ -25,6 +52,12 @@ function ProfilePage() {
             <span>
               E-mail: <b>john@gmail.com</b>
             </span>
+            <button 
+              onClick={handleLogout}
+              disabled={pending}
+            >
+              Logout
+            </button>
           </div>
           <div className="title">
             <h1>My List</h1>
@@ -39,7 +72,7 @@ function ProfilePage() {
       </div>
       <div className="chatContainer">
         <div className="wrapper">
-          <Chat/>
+          <Chat />
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
+import jwt from "jsonwebtoken";
+
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -23,10 +25,13 @@ export const register = async (req, res) => {
     res.status(500).json({ message: "fialed to create user" });
   }
 };
+
+
 export const login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
+
     // check if the user exists or not
     const user = await prisma.user.findUnique({
       where: { username },
@@ -44,14 +49,31 @@ export const login = async (req, res) => {
     }
 
     // generate token and send it to the user
-    res.setHeader("Set-Cookie", "test=" + "myValue")
-        .status(200).json({ message: "user logied in" });
+    const age = 1000 * 60 * 24 * 7 
+
+    const token = jwt.sign({
+      id: user.id,
+    }, process.env.JWT_SECRET_KEY, { expiresIn: age })
+
+    const {password:userPassword, ...userInfo } = user
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        // secure: true, // only in production "HTTPS",
+        maxAge: age,
+        sameSite: "None", // Allows the cookie to be sent in all contexts
+      })
+      .status(200)
+      .json(userInfo);
     
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "fialed to login" });
   }
 };
+
+
 export const logout = (req, res) => {
-  //db operations
+  res.clearCookie("token")
+    .status(200).json({ message: "logout" });
 };
