@@ -1,11 +1,14 @@
 import express from "express"
-import authRoute from "./routes/auth.route.js"
 import cookieParser from "cookie-parser"
 import dotenv from "dotenv";
 import cors from "cors"
 
-dotenv.config();
+import authRoute from "./routes/auth.route.js"
+import testRoute from "./routes/test.route.js"
 
+
+
+dotenv.config();
 
 const app = express()
 
@@ -19,6 +22,7 @@ app.use(cookieParser())
 
 
 app.use("/api/auth", authRoute)
+app.use("/api/test", testRoute)
 
 app.listen(8800, ()=> {
     console.log("server listening on 8800")

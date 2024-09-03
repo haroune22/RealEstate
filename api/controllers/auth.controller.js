@@ -53,6 +53,7 @@ export const login = async (req, res) => {
 
     const token = jwt.sign({
       id: user.id,
+      isAdmin: true,
     }, process.env.JWT_SECRET_KEY, { expiresIn: age })
 
     const {password:userPassword, ...userInfo } = user
@@ -74,6 +75,5 @@ export const login = async (req, res) => {
 
 
 export const logout = (req, res) => {
-  res.clearCookie("token")
-    .status(200).json({ message: "logout" });
+  res.clearCookie("token").status(200).json({ message: "Logout Successful" });
 };
