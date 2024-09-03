@@ -1,13 +1,16 @@
 
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useTransition } from "react";
+import { useContext, useState, useTransition } from "react";
 import { apiRequest } from "../../lib/apiRequest";
+import { AuthContext } from "../../context/AuthContext";
 
 function Login() {
 
   const [error, setError] = useState("")
   const [pending, startTransition] = useTransition()
+  
+  const { currentUser, updateUser } = useContext(AuthContext)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -26,7 +29,7 @@ function Login() {
         });
 
         //setting userInfo in the local storage and rediercting him to the home page
-        localStorage.setItem("user", JSON.stringify(res.data))
+        updateUser(res.data)
         // console.log(res.data)
         navigate('/')
       })
