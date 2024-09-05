@@ -31,45 +31,44 @@ export const login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-
-    // check if the user exists or not
+    // CHECK IF THE USER EXISTS
     const user = await prisma.user.findUnique({
       where: { username },
     });
 
-    if (!user) {
-      res.status(401).json({ message: "Invalid credentials" });
-    }
+    if (!user) return res.status(400).json({ message: "Invalid Credentials!" });
 
-    //check if password is correct
+    // CHECK IF THE PASSWORD IS CORRECT
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
-      res.status(401).json({ message: "Invalid credentials" });
-    }
+    if (!isPasswordValid)
+      return res.status(400).json({ message: "Invalid Credentials!" });
 
-    // generate token and send it to the user
-    const age = 1000 * 60 * 24 * 7 
+    // GENERATE COOKIE TOKEN AND SEND TO THE USER
+    const age = 1000 * 60 * 60 * 24 * 7;
 
-    const token = jwt.sign({
-      id: user.id,
-      isAdmin: true,
-    }, process.env.JWT_SECRET_KEY, { expiresIn: age })
+    const token = jwt.sign(
+      {
+        id: user.id,
+        isAdmin: false,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: age }
+    );
 
-    const {password:userPassword, ...userInfo } = user
-    res
-      .cookie("token", token, {
+    const { password: userPassword, ...userInfo } = user;
+
+    res.cookie("token", token, {
         httpOnly: true,
-        // secure: true, // only in production "HTTPS",
+        // secure:true,
         maxAge: age,
-        sameSite: "None", // Allows the cookie to be sent in all contexts
       })
       .status(200)
       .json(userInfo);
-    
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "fialed to login" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to login!" });
   }
 };
 
