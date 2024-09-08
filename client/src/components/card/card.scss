@@ -8,7 +8,7 @@
     flex: 2;
     height: 200px;
 
-    @include md {
+    @include sm {
       display: none;
     }
 
