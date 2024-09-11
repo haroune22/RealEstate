@@ -1,4 +1,3 @@
-
 import { Server } from "socket.io";
 
 const io = new Server({
@@ -8,9 +7,15 @@ const io = new Server({
 });
 
 io.on("connection", (socket) => {
-  console.log("first connection")
+  console.log("Client connected");
+
+  socket.on("newUser", (data) => {
+    console.log("Data received from client:", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
 });
 
-io.listen(4000, ()=> {
-    console.log("listening on port 3000")
-});
+io.listen(4000);

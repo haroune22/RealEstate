@@ -12,8 +12,18 @@ import Register from "./routes/register/register";
 import ProfileUpdatePage from "./routes/profileUpdatePage/profileUpdatePage"
 import NewPostPage from "./routes/newPostPage/newPostPage"
 import { listPageLoader, profilePageLoader, singlePageLoader } from "./lib/loader";
+import { io } from "socket.io-client";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "./context/AuthContext";
+
+
+
+const socket = io('http://localhost:4000');
+
+
 
 function App() {
+
   const router = createBrowserRouter([
     {
       path: "/",
